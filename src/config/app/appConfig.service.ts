@@ -38,6 +38,10 @@ export class AppConfigService {
     return this.appEnv === envEnum.development;
   }
 
+  get botToken(): string {
+    return this.configService.get<string>(`app.botToken`);
+  }
+
   createAppConfig(): AppConfig {
     return {
       host: this.getField('host'),

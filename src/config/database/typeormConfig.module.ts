@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { envEnum } from '../app/appConfig.module';
 import { TypeormConfig } from './typeormConfig';
@@ -8,7 +9,7 @@ import { TypeormConfigService } from './typeormConfig.service';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: '.env',
+      envFilePath: ['.env', '.env.local'],
       load: [TypeormConfig],
       validationSchema: Joi.object({
         DB_MAIN_PORT: Joi.string().default('5432'),

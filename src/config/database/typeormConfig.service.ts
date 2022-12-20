@@ -40,11 +40,13 @@ export class TypeormConfigService {
       username: this.getField('username'),
       password: this.getField('password'),
       database: this.getField('database'),
-      synchronize: this.isDevelopment,
-      autoLoadEntities: this.isDevelopment,
+      // synchronize: this.isDevelopment,
+      // autoLoadEntities: this.isDevelopment,
       logging: this.isDevelopment,
-      entities: [join(__dirname, 'src/**/*.entity.ts')],
-      migrations: [join(__dirname, 'src/migrations/*{.ts,.js}')],
+      entities: [
+        join(__dirname, '../../', 'database/entities/**/*.entity{.ts,.js}'),
+      ],
+      migrations: [join(__dirname, '../../', 'database/migrations/*{.ts,.js}')],
     };
   }
 }

@@ -1,9 +1,3 @@
-export interface ISideEffect {
-  delay?: number;
-  fuelGenerate?: number;
-  fuelСonsumption: number;
-}
-
 export enum EMessageType {
   text = 'text',
   image = 'image',
@@ -25,28 +19,38 @@ export enum ELocation {
 }
 
 export enum ESceneType {
-  action = 'action',
-  article = 'acticle',
+  scene = 'story',
   question = 'question',
 }
 
 export interface IScenePointer {
   type: ESceneType;
   name: string;
-  sideEffect: ISideEffect;
+}
+
+export interface IReply {
+  type: EMessageType;
+  message?: string | null;
+  messageGenerator?: string;
+  src?: string;
+}
+
+export interface IButton {
+  text?: string | null;
+  textGenerator?: string;
+  nextScene: IScenePointer;
 }
 
 export interface IStoryData {
-  replies: {
-    type: EMessageType;
-    message?: string | null;
-    messageGenerator?: string;
-    src?: string;
-  }[];
-  buttons?: {
-    text?: string | null;
-    textGenerator?: string;
-    nextScene: IScenePointer;
-  }[];
+  replies: IReply[];
+  buttons?: IButton[];
+  nextScene: IScenePointer;
+}
+
+export interface IQuestionData {
+  replies: IReply[];
+  buttons?: IButton[];
+  answers?: string[];
+  repeats?: number;
   nextScene: IScenePointer;
 }
