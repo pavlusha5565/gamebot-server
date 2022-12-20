@@ -13,7 +13,7 @@ export enum envEnum {
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ['.env', '.env.local'],
+      envFilePath: ['.env.local', '.env.development', '.env'],
       load: [appConfig],
       validationSchema: Joi.object({
         APP_ENV: Joi.string()

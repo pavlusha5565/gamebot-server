@@ -3,14 +3,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { envEnum } from '../app/appConfig.module';
-import { TypeormConfig } from './typeormConfig';
+import { TypeormRegisterConfig } from './typeormConfig';
 import { TypeormConfigService } from './typeormConfig.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ['.env', '.env.local'],
-      load: [TypeormConfig],
+      envFilePath: ['.env.local', '.env.development', '.env'],
+      load: [TypeormRegisterConfig],
       validationSchema: Joi.object({
         DB_MAIN_PORT: Joi.string().default('5432'),
         DB_MAIN_HOST: Joi.string().required(),
@@ -27,3 +27,19 @@ import { TypeormConfigService } from './typeormConfig.service';
   exports: [ConfigService, TypeormConfigService],
 })
 export class TypeormConfigModule {}
+
+@Module({
+  imports: [
+    TypeormConfigModule,
+    TypeOrmModule.forRootAsync({
+      imports: [TypeormConfigModule],
+      inject: [TypeormConfigService],
+      useFactory: (configService: TypeormConfigService) => {
+        return configService.createTypeormConfig();
+      },
+    }),
+  ],
+  providers: [ConfigService, TypeormConfigService],
+  exports: [ConfigService, TypeormConfigService],
+})
+export class TypeormRootConfigModule {}

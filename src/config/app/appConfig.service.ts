@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { envEnum } from './appConfig.module';
 
 export interface AppConfig {
@@ -36,10 +35,6 @@ export class AppConfigService {
 
   get isDevelopment(): boolean {
     return this.appEnv === envEnum.development;
-  }
-
-  get botToken(): string {
-    return this.configService.get<string>(`app.botToken`);
   }
 
   createAppConfig(): AppConfig {

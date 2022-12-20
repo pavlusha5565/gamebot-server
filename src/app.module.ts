@@ -6,32 +6,16 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppConfigModule } from './config/app/appConfig.module';
 import { AppConfigService } from './config/app/appConfig.service';
-import { TypeormConfigModule } from './config/database/typeormConfig.module';
-import { TypeormConfigService } from './config/database/typeormConfig.service';
+import { TypeormRootConfigModule } from './config/database/typeormConfig.module';
+import { TelegrafRootConfigModule } from './config/telegraf/telegrafConfig.module';
 import { UsersModule } from './modules/Users/Users.module';
-
-const sessionMiddleware = session();
 
 @Module({
   imports: [
     AppConfigModule,
+    TypeormRootConfigModule,
+    TelegrafRootConfigModule,
     UsersModule,
-    TypeOrmModule.forRootAsync({
-      imports: [TypeormConfigModule],
-      inject: [TypeormConfigService],
-      useFactory: (configService: TypeormConfigService) =>
-        configService.createTypeormConfig(),
-    }),
-    TelegrafModule.forRootAsync({
-      imports: [AppConfigModule],
-      inject: [AppConfigService],
-      useFactory: (configService: AppConfigService) => {
-        return {
-          token: configService.botToken,
-          middlewares: [sessionMiddleware],
-        };
-      },
-    }),
   ],
   controllers: [AppController],
   providers: [AppService],

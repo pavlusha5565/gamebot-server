@@ -1,7 +1,7 @@
 import { registerAs } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
-export const TypeormConfig = registerAs<TypeOrmModuleOptions>(
+export const TypeormRegisterConfig = registerAs<TypeOrmModuleOptions>(
   'database',
   () => {
     return {
