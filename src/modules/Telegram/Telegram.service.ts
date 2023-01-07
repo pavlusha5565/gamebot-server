@@ -6,7 +6,6 @@ import { TelegramEntity } from 'src/database/entities/User/Telegram.entity';
 import { parseTelegramUser } from 'src/utils/telegram';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import {
-  IPaginateResponse,
   IPaginateInput,
   paginate,
   IPaginate,
@@ -20,7 +19,7 @@ export class TelegramService {
   constructor(
     @InjectRepository(TelegramEntity)
     private readonly telegramRepository: Repository<TelegramEntity>,
-    @Inject(UserService)
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
   ) {}
 
@@ -61,8 +60,8 @@ export class TelegramService {
       username: userData.username,
       session: EMPTY_SESSION,
     });
-    const telegram = await this.telegramRepository.save(telegramEntity);
     await this.userService.registerByTelegram(telegramEntity);
+    const telegram = await this.telegramRepository.save(telegramEntity);
     return telegram;
   }
 

@@ -1,5 +1,5 @@
+import { IStoryData } from 'src/common/interfaces/Story.interfaces';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
-import { IStoryData } from 'src/common/interfaces/game.interfaces';
 
 @Entity({ name: 'story' })
 export class StoryEntity {

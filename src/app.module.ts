@@ -5,6 +5,7 @@ import { AppConfigModule } from './config/app/appConfig.module';
 import { TypeormRootConfigModule } from './config/database/typeormConfig.module';
 import { TelegrafRootConfigModule } from './config/telegraf/telegrafConfig.module';
 import { GameModule } from './modules/Game/Game.module';
+import { StoryModule } from './modules/Story/Story.module';
 import { TelegramModule } from './modules/Telegram/telegram.module';
 import { UserModule } from './modules/User/User.module';
 
@@ -15,7 +16,13 @@ const settingModules = [
 ];
 
 @Module({
-  imports: [...settingModules, GameModule, UserModule, TelegramModule],
+  imports: [
+    ...settingModules,
+    GameModule,
+    UserModule,
+    TelegramModule,
+    StoryModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

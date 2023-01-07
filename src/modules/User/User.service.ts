@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User, UserEntity } from 'src/database/entities/User/User.entity';
@@ -9,12 +9,15 @@ import {
   IPaginateInput,
   paginate,
 } from 'src/utils/query/pagination';
+import { TelegramService } from '../Telegram/Telegram.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly usersRepository: Repository<UserEntity>,
+    @Inject(forwardRef(() => TelegramService))
+    private readonly telegramService: TelegramService,
   ) {}
 
   async findById(id: string): Promise<UserEntity> {

@@ -1,4 +1,5 @@
 import { SelectQueryBuilder } from 'typeorm';
+import { applyObject } from '../object';
 
 export interface IPaginateInput {
   page: number;
@@ -35,31 +36,30 @@ const paginationDefault: IPaginateResponse = {
 
 export async function paginate<T>(
   query: SelectQueryBuilder<T>,
-  input: IPaginateInput = paginateInputDefault,
+  input?: IPaginateInput,
 ): Promise<IPaginate<T[]>> {
-  const optionsInput = { ...paginateInputDefault, ...input };
   const options: IPaginateResponse = {
     ...paginationDefault,
-    limit: optionsInput.limit,
+    itemCount: await query.getCount(),
+    page: input.page || paginateInputDefault.page,
+    limit: input.limit || paginateInputDefault.limit,
   };
 
-  options.itemCount = await query.getCount();
-  options.pageCount = Math.ceil(options.itemCount / optionsInput.limit);
+  options.pageCount = Math.ceil(options.itemCount / options.limit);
   options.page =
-    optionsInput.page > options.pageCount
+    options.page < 1
+      ? 1
+      : options.page > options.pageCount
       ? options.pageCount
-      : optionsInput.page;
-
-  if (options.page < 1) {
-    options.page = 1;
-  }
-  if (options.page > options.pageCount) {
-    options.page = options.pageCount;
-  }
+      : options.page;
 
   options.hasNextPage = options.page < options.pageCount;
   options.hasPrevPage = options.page > 1;
 
-  query.limit(optionsInput.limit).take(options.page);
+  const skip = options.page < 1 ? 0 : options.page - 1;
+
+  query.take(options.limit);
+  query.skip(skip);
+
   return { paginate: options, data: await query.getMany() };
 }
