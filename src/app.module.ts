@@ -1,22 +1,21 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { TelegrafModule } from 'nestjs-telegraf';
-import { session } from 'telegraf';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppConfigModule } from './config/app/appConfig.module';
-import { AppConfigService } from './config/app/appConfig.service';
 import { TypeormRootConfigModule } from './config/database/typeormConfig.module';
 import { TelegrafRootConfigModule } from './config/telegraf/telegrafConfig.module';
-import { UsersModule } from './modules/Users/Users.module';
+import { GameModule } from './modules/Game/Game.module';
+import { TelegramModule } from './modules/Telegram/telegram.module';
+import { UserModule } from './modules/User/User.module';
+
+const settingModules = [
+  AppConfigModule,
+  TypeormRootConfigModule,
+  TelegrafRootConfigModule,
+];
 
 @Module({
-  imports: [
-    AppConfigModule,
-    TypeormRootConfigModule,
-    TelegrafRootConfigModule,
-    UsersModule,
-  ],
+  imports: [...settingModules, GameModule, UserModule, TelegramModule],
   controllers: [AppController],
   providers: [AppService],
 })

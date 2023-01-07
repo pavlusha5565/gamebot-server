@@ -1,5 +1,6 @@
 import { Context } from 'telegraf';
 import { User } from 'telegraf/typings/core/types/typegram';
+import { ForbiddenException } from './exeptions';
 
 export function parseTelegramId(context: Context): number {
   return parseTelegramUser(context)?.id || -1;
@@ -19,4 +20,11 @@ export function parseTelegramUser(context: Context): User | null {
   }
 
   return null;
+}
+
+export function checkTelegramBot(ctx: Context) {
+  const user = parseTelegramUser(ctx);
+  if (user.is_bot) {
+    throw new ForbiddenException(`Bot is not supported as player`);
+  }
 }

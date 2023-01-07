@@ -1,32 +1,32 @@
 import {
   Entity,
-  JoinColumn,
-  JoinTable,
-  ManyToMany,
-  ManyToOne,
+  Column,
   OneToOne,
+  JoinColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { UsersEntity } from '../Users/Users.entity';
-import { ScenesEntity } from './Scenes.entity';
+import { UserEntity } from '../User/User.entity';
+import { StoryEntity } from './Story.entity';
 
-@Entity('game')
-export class GameEntity {
+export class Game {
+  @Column()
+  storyId: string;
+
+  @Column({ type: 'varchar', array: true, default: [] })
+  saveSlots: string[];
+}
+
+@Entity({ name: 'game' })
+export class GameEntity extends Game {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToOne(() => UsersEntity, (usersEntity) => usersEntity.game)
-  user: UsersEntity;
+  @OneToOne(() => UserEntity, (userEntity) => userEntity.id)
+  user: UserEntity;
 
-  @OneToOne(() => ScenesEntity, { nullable: true })
-  @JoinColumn({ name: 'sceneId' })
-  scene: ScenesEntity;
-
-  @ManyToMany(() => ScenesEntity, { nullable: true })
-  @JoinTable({
-    name: 'LatestSceneIds',
-    joinColumn: { name: 'latestScenesId', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'gameId', referencedColumnName: 'id' },
+  @OneToOne(() => StoryEntity, (storyEntity) => storyEntity.id, {
+    nullable: true,
   })
-  latestScenes: ScenesEntity[];
+  @JoinColumn({ name: 'storyId' })
+  story: StoryEntity;
 }

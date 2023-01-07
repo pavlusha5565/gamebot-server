@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TelegrafModuleOptions } from 'nestjs-telegraf';
-import { session } from 'telegraf';
+import { createPostgreSQLSession } from 'src/common/middlewares/telegramSession.middleware';
 
 export interface AppConfig {
   host: string;
@@ -23,7 +23,7 @@ export class TelegrafConfigService {
   }
 
   createRootConfig(): TelegrafModuleOptions {
-    const sessionMiddleware = session();
+    const sessionMiddleware = createPostgreSQLSession();
 
     return {
       token: this.token,

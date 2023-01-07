@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { join } from 'path';
 import { envEnum } from '../app/appConfig.module';
 
 @Injectable()
@@ -16,8 +15,8 @@ export class TypeormConfigService {
     return port;
   }
 
-  getField(name: string): string {
-    return this.configService.get<string>(`database.${name}`);
+  getField<T = string>(name: string): T {
+    return this.configService.get<T>(`database.${name}`);
   }
 
   parseBool(name: string): boolean {
@@ -40,13 +39,10 @@ export class TypeormConfigService {
       username: this.getField('username'),
       password: this.getField('password'),
       database: this.getField('database'),
-      // synchronize: this.isDevelopment,
-      // autoLoadEntities: this.isDevelopment,
+      synchronize: this.parseBool('synchronize'),
       logging: this.isDevelopment,
-      entities: [
-        join(__dirname, '../../', 'database/entities/**/*.entity{.ts,.js}'),
-      ],
-      migrations: [join(__dirname, '../../', 'database/migrations/*{.ts,.js}')],
+      entities: this.getField<string[]>('entities'),
+      migrations: this.getField<string[]>('migrations'),
     };
   }
 }

@@ -7,8 +7,6 @@ async function bootstrap() {
     logger: ['error', 'warn'],
   });
   const appConfig: AppConfigService = app.get(AppConfigService);
-  console.log(appConfig.port);
-
   await app.listen(appConfig.port);
 }
 

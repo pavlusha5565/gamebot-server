@@ -1,16 +1,10 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 import { IStoryData } from 'src/common/interfaces/game.interfaces';
 
-@Entity({ name: 'scenes' })
-export class ScenesEntity {
+@Entity({ name: 'story' })
+export class StoryEntity {
   @PrimaryColumn({ unique: true })
   id: string;
-
-  @Column()
-  location: string;
-
-  @Column()
-  distance: number;
 
   @Column({ type: 'jsonb' })
   replies: IStoryData['replies'];

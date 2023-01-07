@@ -1,7 +1,13 @@
 export enum EMessageType {
   text = 'text',
+  textGenerator = 'textGenerator',
   image = 'image',
   voice = 'voice',
+}
+
+export enum EButtonType {
+  button = 'button',
+  buttonGenerator = 'buttonGenerator',
 }
 
 export enum ELocation {
@@ -23,34 +29,30 @@ export enum ESceneType {
   question = 'question',
 }
 
+export interface ISideEffect {
+  delay?: number;
+  energyConsumation: number;
+}
+
 export interface IScenePointer {
   type: ESceneType;
-  name: string;
+  scene: string;
+  sideEffect?: ISideEffect;
 }
 
 export interface IReply {
   type: EMessageType;
-  message?: string | null;
-  messageGenerator?: string;
-  src?: string;
+  content: string;
 }
 
 export interface IButton {
-  text?: string | null;
-  textGenerator?: string;
+  type: EButtonType;
+  content: string;
   nextScene: IScenePointer;
 }
 
 export interface IStoryData {
   replies: IReply[];
   buttons?: IButton[];
-  nextScene: IScenePointer;
-}
-
-export interface IQuestionData {
-  replies: IReply[];
-  buttons?: IButton[];
-  answers?: string[];
-  repeats?: number;
-  nextScene: IScenePointer;
+  nextScene?: IScenePointer;
 }

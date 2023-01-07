@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { TelegrafModule } from 'nestjs-telegraf';
-import { session } from 'telegraf';
 import { TelegrafRegisterConfig } from './telegrafConfig';
 import { TelegrafConfigService } from './telegrafConfig.service';
 

@@ -1,9 +1,6 @@
-export function applyObject<T extends object>(
-  source: T,
-  target: Partial<T>,
-): T {
-  for (const key in target) {
-    source[key] = target[key];
+export function applyObject<T extends object>(source: T, data: Partial<T>): T {
+  for (const key in data) {
+    source[key] = data[key];
   }
   return source;
 }
