@@ -7,7 +7,6 @@ import {
   IPaginateInput,
   paginate,
 } from 'src/utils/query/pagination';
-import { applyFilter } from 'src/utils/query/query';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 
 @Injectable()
