@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Update } from 'nestjs-telegraf';
 import { StoryEntity } from 'src/database/entities/Game/Story.entity';
 import { IPaginateInput } from 'src/utils/query/pagination';
 import { StoryService } from './Story.service';
@@ -20,5 +21,15 @@ export class StoryController {
   @Post('new')
   async addStory(@Body() story: StoryEntity) {
     return this.storyService.addStory(story);
+  }
+
+  @Post(':id')
+  async updateStory(@Param('id') id: string, @Body() story: StoryEntity) {
+    return this.storyService.updateStory(id, story);
+  }
+
+  @Delete(':id')
+  async deleteStory(@Param('id') id: string) {
+    return this.storyService.deleteStory(id);
   }
 }
