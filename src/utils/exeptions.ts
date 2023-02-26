@@ -27,11 +27,19 @@ export function checkExist(target: any, msg?: string) {
   }
 }
 
-export function checkField<T extends object>(target: T, field: keyof T) {
+export function checkField<T extends object>(
+  target: T,
+  field: keyof T | (keyof T)[],
+) {
   checkExist(target);
-  if (!target[field]) {
+  if (Array.isArray(target)) {
+    for (let i = 0; i < target.length; i++) {
+      checkExist(target[i]);
+    }
+  }
+  if (!target[field as keyof T]) {
     throw new HttpException(
-      `${String(field)} in not nullable`,
+      `${String(field)} is not nullable`,
       HttpStatus.BAD_REQUEST,
     );
   }

@@ -4,8 +4,13 @@ import { User, UserEntity } from 'src/database/entities/User/User.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { UserService } from './User.service';
-import { checkField, InternalServerError } from 'src/utils/exeptions';
+import {
+  checkExist,
+  checkField,
+  InternalServerError,
+} from 'src/utils/exeptions';
 import { PostgresErrorCode } from 'src/common/constants/postgres.enum';
+import { check } from 'prettier';
 
 @Injectable()
 export class AuthenticationService {
@@ -21,7 +26,7 @@ export class AuthenticationService {
     const hashedPassword = await bcrypt.hash(user.password, salt);
     checkField<User>(user, 'password');
     try {
-      const createdUser = await this.userService.addUser({
+      const createdUser = await this.userService.createUser({
         ...user,
         password: hashedPassword,
       });
@@ -41,6 +46,7 @@ export class AuthenticationService {
   public async getAuthenticatedUser(email: string, plainTextPassword: string) {
     try {
       const user = await this.userService.findByEmail(email);
+      checkExist(user);
       await this.verifyPassword(plainTextPassword, user.password);
       user.password = undefined;
       return user;

@@ -8,18 +8,18 @@ import { UserService } from './User.service';
 @Controller('user')
 export class UserController {
   constructor(
-    private readonly UserService: UserService,
+    private readonly userService: UserService,
     private readonly authService: AuthenticationService,
   ) {}
 
   @Get('all')
   async findAll(@Body() paginate: IPaginateInput) {
-    return this.UserService.findAllPaginate(paginate);
+    return this.userService.findAllPaginate(paginate);
   }
 
   @Get(':id')
   async findUser(@Param('id') id: string) {
-    const user = this.UserService.findById(id);
+    const user = this.userService.findById(id);
     checkExist(user);
     return user;
   }
@@ -28,7 +28,6 @@ export class UserController {
   async addUser(@Body() data: INewUserInput) {
     return this.authService.register({
       ...data,
-      publicname: null,
       username: null,
     });
   }

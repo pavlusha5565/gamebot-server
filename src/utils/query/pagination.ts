@@ -1,5 +1,4 @@
 import { SelectQueryBuilder } from 'typeorm';
-import { applyObject } from '../object';
 
 export interface IPaginateInput {
   page: number;
@@ -16,9 +15,11 @@ export interface IPaginateResponse {
 }
 
 export interface IPaginate<T> {
-  data: T;
+  data: T[];
   paginate: IPaginateResponse;
 }
+
+export type TTransformer<T> = (data: T[]) => T[];
 
 export const paginateInputDefault: IPaginateInput = {
   page: 1,
@@ -37,7 +38,8 @@ const paginationDefault: IPaginateResponse = {
 export async function paginate<T>(
   query: SelectQueryBuilder<T>,
   input?: IPaginateInput,
-): Promise<IPaginate<T[]>> {
+  transformer: TTransformer<T> = (x) => x,
+): Promise<IPaginate<T>> {
   const options: IPaginateResponse = {
     ...paginationDefault,
     itemCount: await query.getCount(),
@@ -61,5 +63,8 @@ export async function paginate<T>(
   query.take(options.limit);
   query.skip(skip);
 
-  return { paginate: options, data: await query.getMany() };
+  return {
+    data: transformer(await query.getMany()),
+    paginate: options,
+  };
 }
