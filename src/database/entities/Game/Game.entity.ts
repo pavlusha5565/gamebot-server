@@ -1,3 +1,4 @@
+import { Expose } from 'class-transformer';
 import { Shape } from 'src/common/interfaces/utils.interface';
 import {
   PrimaryGeneratedColumn,
@@ -27,6 +28,7 @@ export class Game {
 }
 
 @Entity({ name: 'game' })
+@Expose()
 export class GameEntity extends Game {
   @PrimaryGeneratedColumn('uuid')
   id: string;

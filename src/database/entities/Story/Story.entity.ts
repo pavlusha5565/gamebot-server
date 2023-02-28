@@ -1,9 +1,12 @@
+import { Expose } from 'class-transformer';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -14,14 +17,15 @@ export class Story {
   @Column()
   name: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
   description: string;
 
-  @Column()
+  @Column({ nullable: true })
   playtime: number;
 }
 
 @Entity({ name: 'story' })
+@Expose()
 export class StoryEntity extends Story {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -29,8 +33,12 @@ export class StoryEntity extends Story {
   @ManyToOne(() => UserEntity, { cascade: true })
   author: UserEntity;
 
+  @OneToOne(() => StoryEventEntity, { nullable: true })
+  @JoinColumn({ name: 'start_event_id' })
+  startEvent: StoryEventEntity;
+
   @OneToMany(() => StoryEventEntity, (event) => event.story)
-  events: StoryEntity[];
+  events: StoryEventEntity[];
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;

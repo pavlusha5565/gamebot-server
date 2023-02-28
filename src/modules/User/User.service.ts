@@ -16,27 +16,27 @@ export class UserService {
     private readonly usersRepository: Repository<UserEntity>,
   ) {}
 
-  async findById(id: string): Promise<UserEntity> {
+  public async findById(id: string): Promise<UserEntity> {
     const user = await this.queryBuilder
       .where('user.id = :id', { id })
       .getOne();
     return user;
   }
 
-  async findByEmail(email: string): Promise<UserEntity> {
+  public async findByEmail(email: string): Promise<UserEntity> {
     const user = await this.queryBuilder
       .where('user.email = :email', { email })
       .getOne();
     return user;
   }
 
-  async findAll(page?: IPaginateInput): Promise<IPaginate<UserEntity>> {
+  public async findAll(page?: IPaginateInput): Promise<IPaginate<UserEntity>> {
     return paginate<UserEntity>(this.queryBuilder, page, (data) =>
       data.map((user) => ({ ...user, password: undefined })),
     );
   }
 
-  async createUser(user: User): Promise<UserEntity> {
+  public async createUser(user: User): Promise<UserEntity> {
     const userEntity = new UserEntity();
     applyObject(userEntity, user);
     return this.usersRepository.save(userEntity);
@@ -45,14 +45,14 @@ export class UserService {
   /**
    * Удаление любого пользователя.
    */
-  async deleteUser(id: string): Promise<UserEntity> {
+  public async deleteUser(id: string): Promise<UserEntity> {
     const user = await this.queryBuilder
       .where('user.id = :id', { id })
       .getOne();
     return this.usersRepository.remove(user);
   }
 
-  async updateUser(id: string, user: User): Promise<UserEntity> {
+  public async updateUser(id: string, user: User): Promise<UserEntity> {
     const userEntity = await this.queryBuilder
       .where('user.id = :id', { id })
       .getOne();

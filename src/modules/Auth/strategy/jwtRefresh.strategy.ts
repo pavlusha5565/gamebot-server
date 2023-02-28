@@ -29,7 +29,10 @@ export class JwtRefreshStrategy extends PassportStrategy(
     });
   }
 
-  async validate(request: Request, payload: ITokenPayload): Promise<any> {
+  public async validate(
+    request: Request,
+    payload: ITokenPayload,
+  ): Promise<any> {
     const token: string | undefined = request?.cookies?.Refresh;
     const jwtPayload: ITokenPayload = parseJwt<ITokenPayload>(token);
     console.log(jwtPayload);

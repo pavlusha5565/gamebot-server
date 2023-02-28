@@ -31,13 +31,15 @@ export class AuthController {
   ) {}
 
   @Post('register')
-  async register(@Body() registerData: RegisterDto): Promise<UserEntity> {
+  public async register(
+    @Body() registerData: RegisterDto,
+  ): Promise<UserEntity> {
     return this.authService.register(registerData);
   }
 
   @Post('login')
   @UseGuards(LocalAuthGuard)
-  async login(
+  public async login(
     @User() user: UserEntity,
     @Res() response: Response,
   ): Promise<Response<SessionEntity>> {
@@ -55,9 +57,8 @@ export class AuthController {
   }
 
   @Post('refresh')
-  // @UseGuards(JwtRefreshGuard)
   @UseGuards(JwtAuthGuard)
-  async refresh(@User() user: UserEntity, @Res() response: Response) {
+  public async refresh(@User() user: UserEntity, @Res() response: Response) {
     const token = this.authService.getAuthToken(user.id, user.email);
     response.setHeader(
       'Set-Cookie',
@@ -67,7 +68,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  async logout(
+  public async logout(
     @User() user: UserEntity,
     @Req() request: Request,
     @Res() response: Response,
