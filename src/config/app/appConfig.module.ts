@@ -13,17 +13,23 @@ export enum envEnum {
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ['.env.local', '.env.development', '.env'],
+      envFilePath: [
+        '.env.local',
+        '.env.development',
+        '.env.production',
+        '.env',
+      ],
       load: [appConfig],
       validationSchema: Joi.object({
         APP_ENV: Joi.string()
           .valid(...Object.keys(envEnum))
           .default(envEnum.development),
-        DB_MAIN_PORT: Joi.string().default('5432'),
-        DB_MAIN_HOST: Joi.string().required(),
-        DB_MAIN_DATABASE: Joi.string().required(),
-        DB_MAIN_USER: Joi.string().required(),
-        DB_MAIN_PASSWORD: Joi.string().required(),
+        APP_HOST: Joi.string().default('localhost'),
+        APP_PORT: Joi.string().default('3001'),
+        APP_JWT_SECRET: Joi.string().required(),
+        APP_JWT_EXPIRES_IN: Joi.string().default('600s'),
+        APP_JWT_REFRESH_SECRET: Joi.string().required(),
+        APP_JWT_REFRESH_EXPIRES_IN: Joi.string().default('1d'),
       }),
     }),
   ],

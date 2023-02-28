@@ -4,7 +4,8 @@ export interface IUserSearch {
   email?: string;
 }
 
-export interface INewUserInput {
+export type RegisterDto = {
   email: string;
+  username: string;
   password: string;
-}
+};

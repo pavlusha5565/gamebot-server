@@ -21,7 +21,7 @@ export class Story {
   playtime: number;
 }
 
-@Entity()
+@Entity({ name: 'story' })
 export class StoryEntity extends Story {
   @PrimaryGeneratedColumn('uuid')
   id: string;

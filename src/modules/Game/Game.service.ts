@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { GameEntity } from 'src/database/entities/Game/Game.entity';
 import { checkExist } from 'src/utils/exeptions';
 import { applyObject } from 'src/utils/object';
@@ -14,6 +15,7 @@ import { IGameUpdateInput } from './Game.interfaces';
 @Injectable()
 export class GameService {
   constructor(
+    @InjectRepository(GameEntity)
     private readonly gameRepository: Repository<GameEntity>,
     private readonly userService: UserService,
   ) {}

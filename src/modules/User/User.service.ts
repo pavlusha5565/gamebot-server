@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { User, UserEntity } from 'src/database/entities/User/User.entity';
-import { AuthenticationService } from './Authentication.service';
 import { applyObject } from 'src/utils/object';
 import {
   IPaginate,
@@ -31,7 +30,7 @@ export class UserService {
     return user;
   }
 
-  async findAllPaginate(page?: IPaginateInput): Promise<IPaginate<UserEntity>> {
+  async findAll(page?: IPaginateInput): Promise<IPaginate<UserEntity>> {
     return paginate<UserEntity>(this.queryBuilder, page, (data) =>
       data.map((user) => ({ ...user, password: undefined })),
     );
@@ -75,7 +74,7 @@ export class UserService {
     return null;
   }
 
-  private get queryBuilder() {
+  private get queryBuilder(): SelectQueryBuilder<UserEntity> {
     const query = this.usersRepository.createQueryBuilder('user');
     return query;
   }

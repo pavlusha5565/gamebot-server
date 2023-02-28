@@ -9,7 +9,12 @@ import { TypeormConfigService } from './typeormConfig.service';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ['.env.local', '.env.development', '.env'],
+      envFilePath: [
+        '.env.local',
+        '.env.development',
+        '.env.production',
+        '.env',
+      ],
       load: [TypeormRegisterConfig],
       validationSchema: Joi.object({
         DB_MAIN_PORT: Joi.string().default('5432'),
@@ -17,9 +22,6 @@ import { TypeormConfigService } from './typeormConfig.service';
         DB_MAIN_DATABASE: Joi.string().required(),
         DB_MAIN_USER: Joi.string().required(),
         DB_MAIN_PASSWORD: Joi.string().required(),
-        APP_ENV: Joi.string()
-          .valid(...Object.keys(envEnum))
-          .default(envEnum.development),
       }),
     }),
   ],

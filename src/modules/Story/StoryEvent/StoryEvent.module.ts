@@ -5,7 +5,6 @@ import { StoryEventService } from './StoryEvent.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([StoryEventEntity])],
-  controllers: [],
   providers: [StoryEventService],
   exports: [StoryEventService],
 })

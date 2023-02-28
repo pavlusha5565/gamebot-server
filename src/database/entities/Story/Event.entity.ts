@@ -16,7 +16,7 @@ export class StoryEvent {
   nextScene: IStoryData['nextScene'];
 }
 
-@Entity({ name: 'story' })
+@Entity({ name: 'story_event' })
 export class StoryEventEntity extends StoryEvent {
   @PrimaryGeneratedColumn('uuid')
   id: string;

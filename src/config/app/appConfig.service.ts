@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { IAppEnv } from './appConfig';
 import { envEnum } from './appConfig.module';
 
 export interface AppConfig {
@@ -7,6 +8,8 @@ export interface AppConfig {
   port: number;
   env: string;
   development: boolean;
+  jwtSecret: string;
+  jwtExpiresIn: string;
 }
 
 @Injectable()
@@ -21,11 +24,11 @@ export class AppConfigService {
     return port;
   }
 
-  getField(name: string): string {
+  getField(name: keyof IAppEnv): string {
     return this.configService.get<string>(`app.${name}`);
   }
 
-  parseBool(name: string): boolean {
+  parseBool(name: keyof IAppEnv): boolean {
     return this.configService.get<string>(`app.${name}`) === 'true';
   }
 
@@ -42,6 +45,8 @@ export class AppConfigService {
       host: this.getField('host'),
       port: this.port,
       env: this.getField('appEnv'),
+      jwtSecret: this.getField('jwtSecret'),
+      jwtExpiresIn: this.getField('jwtExpiresIn'),
       development: this.isDevelopment,
     };
   }

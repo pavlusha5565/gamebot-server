@@ -4,26 +4,15 @@ import { AppService } from './app.service';
 import { LoggerMiddleware } from './common/middlewares/logger.middleware';
 import { AppConfigModule } from './config/app/appConfig.module';
 import { TypeormRootConfigModule } from './config/database/typeormConfig.module';
-import { TelegrafRootConfigModule } from './config/telegraf/telegrafConfig.module';
+import { AuthModule } from './modules/Auth/Auth.module';
 import { GameModule } from './modules/Game/Game.module';
 import { StoryModule } from './modules/Story/Story.module';
-import { TelegramModule } from './modules/Telegram/telegram.module';
 import { UserModule } from './modules/User/User.module';
 
-const settingModules = [
-  AppConfigModule,
-  TypeormRootConfigModule,
-  TelegrafRootConfigModule,
-];
+const settingModules = [AppConfigModule, TypeormRootConfigModule];
 
 @Module({
-  imports: [
-    ...settingModules,
-    GameModule,
-    UserModule,
-    TelegramModule,
-    StoryModule,
-  ],
+  imports: [...settingModules, AuthModule, GameModule, UserModule, StoryModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
   JoinColumn,
 } from 'typeorm';
-import { EventEntity } from '../Story/Event.entity';
+import { StoryEventEntity } from '../Story/Event.entity';
 import { StoryEntity } from '../Story/Story.entity';
 import { UserEntity } from '../User/User.entity';
 
@@ -26,7 +26,7 @@ export class Game {
   attributes: Shape;
 }
 
-@Entity()
+@Entity({ name: 'game' })
 export class GameEntity extends Game {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -42,9 +42,9 @@ export class GameEntity extends Game {
   @JoinColumn({ name: 'story_id' })
   story: StoryEntity;
 
-  @ManyToOne(() => EventEntity, { cascade: ['remove', 'update'] })
+  @ManyToOne(() => StoryEventEntity, { cascade: ['remove', 'update'] })
   @JoinColumn({ name: 'event_id' })
-  event: EventEntity;
+  event: StoryEventEntity;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;
