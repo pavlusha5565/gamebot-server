@@ -4,3 +4,7 @@ export function applyObject<T extends object>(source: T, data: Partial<T>): T {
   }
   return source;
 }
+
+export function parseJwt<T>(token: string): T {
+  return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+}

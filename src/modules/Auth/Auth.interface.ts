@@ -6,4 +6,5 @@ export interface ILogin {
 export interface ITokenPayload {
   email: string;
   userId: string;
+  sessionId: string;
 }

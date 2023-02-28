@@ -6,6 +6,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { ERole, UserEntity } from 'src/database/entities/User/User.entity';
+import { v4 as uuidv4 } from 'uuid';
 import * as bcrypt from 'bcrypt';
 import { UserService } from '../User/User.service';
 import { JwtService } from '@nestjs/jwt';
@@ -22,6 +23,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { applyObject } from 'src/utils/object';
 import { checkExist } from 'src/utils/exeptions';
+import { expiresInToSeconds, getExpiresDate } from 'src/utils/date';
 
 export interface ITokenData {
   token: string;
@@ -70,7 +72,7 @@ export class AuthService {
    * @returns jwt token
    */
   public getAuthToken(userId: string, email: string): ITokenData {
-    const payload: ITokenPayload = { userId, email };
+    const payload: ITokenPayload = { userId, email, sessionId: null };
     const expiresIn = this.configService.getField('jwtExpiresIn');
     const token = this.jwtService.sign(payload, {
       secret: this.configService.getField('jwtSecret'),
@@ -88,8 +90,7 @@ export class AuthService {
    * @param email UserEntity.email
    * @returns jwt token
    */
-  public getRefreshToken(userId: string, email: string): ITokenData {
-    const payload: ITokenPayload = { userId, email };
+  public getRefreshToken(payload: ITokenPayload): ITokenData {
     const expiresIn = this.configService.getField('jwtRefreshExpiresIn');
     const token = this.jwtService.sign(payload, {
       secret: this.configService.getField('jwtRefreshSecret'),
@@ -106,7 +107,8 @@ export class AuthService {
    * @param token jwt token
    * @returns Cookie string
    */
-  public generateAuthCookie(token: string, expiresIn: string): string {
+  public generateAuthCookie(token: string): string {
+    const expiresIn = this.configService.getField('jwtExpiresIn');
     return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${expiresIn}`;
   }
 
@@ -115,7 +117,8 @@ export class AuthService {
    * @param token jwt token
    * @returns Cookie string
    */
-  public generateRefreshCookie(token: string, expiresIn: string): string {
+  public generateRefreshCookie(token: string): string {
+    const expiresIn = this.configService.getField('jwtRefreshExpiresIn');
     return `Refresh=${token}; HttpOnly; Path=/; Max-Age=${expiresIn}`;
   }
 
@@ -126,21 +129,47 @@ export class AuthService {
     };
   }
 
-  public async findByUserId(userId: string): Promise<SessionEntity> {
-    return this.queryBuilder.where('user.id = :id', { id: userId }).getOne();
+  public async findOneByUserId(
+    userId: string,
+    sessionId: string,
+  ): Promise<SessionEntity> {
+    return this.queryBuilder
+      .where('user.id = :userId', { userId: userId })
+      .andWhere('session.id = :id', { id: sessionId })
+      .getOne();
   }
 
-  public async createSession(user: UserEntity): Promise<SessionEntity> {
-    // todo, временная мера, ограничивающая 1й авторизацией.
-    // Нужно добавить больше уникальных данных, для различия сессий
-    // (типа id компьютера, браузер и тд)
-    await this.deleteSession(user.id);
+  public async findByUserId(userId: string): Promise<SessionEntity[]> {
+    return this.queryBuilder.where('user.id = :id', { id: userId }).getMany();
+  }
+
+  public async findById(id: string): Promise<SessionEntity> {
+    return this.queryBuilder.where('session.id = :id', { id: id }).getOne();
+  }
+
+  public async createSession(
+    user: UserEntity,
+    payload?: Partial<Session>,
+  ): Promise<SessionEntity> {
+    // todo fix me
+    this.deleteSessions(user.id);
+
     const session = new SessionEntity();
-    const refreshTokenData = this.getRefreshToken(user.id, user.email);
+    const sessionId = uuidv4();
+
+    const refreshTokenData = this.getRefreshToken({
+      userId: user.id,
+      email: user.email,
+      sessionId: sessionId,
+    });
+    const expiresAt = getExpiresDate(refreshTokenData.expiresIn);
+
     applyObject(session, {
+      ...(payload || {}),
+      id: sessionId,
       refreshToken: refreshTokenData.token,
       user: user,
-      expiresIn: refreshTokenData.expiresIn,
+      expiresAt,
       lastAccessAt: new Date(),
     });
     return this.sessionRepository.save(session);
@@ -148,32 +177,50 @@ export class AuthService {
 
   public async updateSession(
     userId: string,
-    payload: Partial<Session>,
+    sessionId: string,
+    payload?: Partial<Session>,
   ): Promise<SessionEntity> {
-    const session = await this.findByUserId(userId);
+    const session = await this.findOneByUserId(userId, sessionId);
     checkExist(session);
-    applyObject(session, payload);
+    applyObject(session, {
+      ...(payload || {}),
+      lastAccessAt: new Date(),
+    });
     return this.sessionRepository.save(session);
   }
 
-  public async deleteSession(userId: string): Promise<SessionEntity> {
-    const session = await this.findByUserId(userId);
+  public async deleteSession(
+    userId: string,
+    sessionId: string,
+  ): Promise<SessionEntity> {
+    const session = await this.findOneByUserId(userId, sessionId);
     if (!session) {
       return;
     }
     return this.sessionRepository.remove(session);
   }
 
+  public async deleteSessions(userId: string): Promise<boolean> {
+    const sessions = await this.findByUserId(userId);
+    await this.queryBuilder
+      .delete()
+      .where('session.id IN (:...ids)', { ids: sessions.map((i) => i.id) })
+      .execute();
+    return true;
+  }
+
   public async validateRefreshToken(
     token: string,
     userId: string,
+    sessionId: string,
   ): Promise<UserEntity | null> {
-    const session = await this.findByUserId(userId);
-    if (session.refreshToken === token) {
-      applyObject(session, { lastAccessAt: new Date() });
-      this.sessionRepository.save(session);
+    const session = await this.findOneByUserId(userId, sessionId);
+
+    if (session?.refreshToken === token) {
+      this.updateSession(userId, session.id);
       return session.user;
     }
+
     return null;
   }
 

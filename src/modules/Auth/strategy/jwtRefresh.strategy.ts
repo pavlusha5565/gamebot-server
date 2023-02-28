@@ -6,6 +6,7 @@ import { AppConfigService } from 'src/config/app/appConfig.service';
 import { ITokenPayload } from '../Auth.interface';
 import { UserService } from 'src/modules/User/User.service';
 import { AuthService } from '../Auth.service';
+import { parseJwt } from 'src/utils/object';
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(
@@ -30,9 +31,12 @@ export class JwtRefreshStrategy extends PassportStrategy(
 
   async validate(request: Request, payload: ITokenPayload): Promise<any> {
     const token: string | undefined = request?.cookies?.Refresh;
+    const jwtPayload: ITokenPayload = parseJwt<ITokenPayload>(token);
+    console.log(jwtPayload);
     const user = await this.authService.validateRefreshToken(
       token,
       payload.userId,
+      jwtPayload.sessionId,
     );
     if (user) {
       return user;
