@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Story, StoryEntity } from 'src/database/entities/Story/Story.entity';
 import { UserEntity } from 'src/database/entities/User/User.entity';
 import { applyObject } from 'src/utils/object';
+import { addWhere } from 'src/utils/query/queries';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { StoryEventService } from './StoryEvent.service';
 
@@ -14,10 +15,13 @@ export class StoryService {
     private readonly eventService: StoryEventService,
   ) {}
 
-  public async findById(id: string): Promise<StoryEntity> {
-    console.log(id);
-
-    return this.queryBuilder.where('story.id = :id', { id }).getOne();
+  public async findById(id: string, userId?: string): Promise<StoryEntity> {
+    const query = this.queryBuilder;
+    addWhere(query, {
+      id: id,
+      author: { id: userId },
+    });
+    return query.getOne();
   }
 
   public async createStory(
@@ -26,10 +30,9 @@ export class StoryService {
   ): Promise<StoryEntity> {
     const story = new StoryEntity();
     applyObject(story, {
-      author: user,
+      user: user,
       ...payload,
     });
-    console.log(story);
 
     return this.storyRepository.save(story);
   }

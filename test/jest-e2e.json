@@ -1,9 +1,20 @@
 {
-  "moduleFileExtensions": ["js", "json", "ts"],
-  "rootDir": ".",
-  "testEnvironment": "node",
-  "testRegex": ".e2e-spec.ts$",
-  "transform": {
-    "^.+\\.(t|j)s$": "ts-jest"
+  "name": "test",
+  "replies": [
+    {
+      "type": "text",
+      "content": "Some text"
+    }
+  ],
+  "answers": {
+    "type": "text",
+    "content": "Some answers text",
+    "nextScene": {
+      "scene": "",
+      "payload": {
+        "power": 100,
+        "strenge": 100
+      }
+    }
   }
 }

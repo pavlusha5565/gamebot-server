@@ -13,6 +13,11 @@ import {
 import { UserEntity } from '../User/User.entity';
 import { StoryEventEntity } from './Event.entity';
 
+export enum EPrivacy {
+  private = 'private',
+  public = 'public',
+}
+
 export class Story {
   @Column()
   name: string;
@@ -22,6 +27,9 @@ export class Story {
 
   @Column({ nullable: true })
   playtime: number;
+
+  @Column({ enum: EPrivacy, default: EPrivacy.private, nullable: true })
+  privacy: EPrivacy;
 }
 
 @Entity({ name: 'story' })
@@ -31,7 +39,7 @@ export class StoryEntity extends Story {
   id: string;
 
   @ManyToOne(() => UserEntity, { cascade: true })
-  author: UserEntity;
+  user: UserEntity;
 
   @OneToOne(() => StoryEventEntity, { nullable: true })
   @JoinColumn({ name: 'start_event_id' })

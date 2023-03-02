@@ -4,15 +4,16 @@ import {
   StoryEvent,
   StoryEventEntity,
 } from 'src/database/entities/Story/Event.entity';
-import { StoryEntity } from 'src/database/entities/Story/Story.entity';
+import {
+  EPrivacy,
+  StoryEntity,
+} from 'src/database/entities/Story/Story.entity';
 import { checkExist } from 'src/utils/exeptions';
 import { applyObject } from 'src/utils/object';
-import {
-  IPaginate,
-  IPaginateInput,
-  paginate,
-} from 'src/utils/query/pagination';
+import { Paginate, IPaginateInput, paginate } from 'src/utils/query/pagination';
+import { addWhere } from 'src/utils/query/queries';
 import { Repository, SelectQueryBuilder } from 'typeorm';
+import { StoryEventSearch } from './Story.interface';
 
 @Injectable()
 export class StoryEventService {
@@ -25,7 +26,23 @@ export class StoryEventService {
     return this.queryBuilder.where('event.id = :id', { id }).getOne();
   }
 
-  async findAll(input: IPaginateInput): Promise<IPaginate<StoryEventEntity>> {
+  async search(
+    input: StoryEventSearch,
+    page: IPaginateInput,
+  ): Promise<Paginate<StoryEventEntity>> {
+    const query = this.queryBuilder;
+    addWhere<StoryEventEntity>(query, {
+      id: input.id,
+      name: input.name,
+      privacy: EPrivacy.public,
+      story: {
+        id: input.storyId,
+      },
+    });
+    return paginate(query, page);
+  }
+
+  async findAll(input: IPaginateInput): Promise<Paginate<StoryEventEntity>> {
     return paginate(this.queryBuilder, input);
   }
 
@@ -56,7 +73,7 @@ export class StoryEventService {
 
   private get queryBuilder(): SelectQueryBuilder<StoryEventEntity> {
     const query = this.storyEventRepository.createQueryBuilder('event');
-    query.leftJoinAndSelect('event.story', 'story');
+    query.leftJoin('event.story', 'story');
     return query;
   }
 }

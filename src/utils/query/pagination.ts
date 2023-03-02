@@ -14,9 +14,14 @@ export interface IPaginateResponse {
   limit: number;
 }
 
-export interface IPaginate<T> {
+export interface Paginate<T> {
   data: T[];
   paginate: IPaginateResponse;
+}
+
+export interface PaginateInput<T> {
+  data: T;
+  page?: IPaginateInput;
 }
 
 export type TTransformer<T> = (data: T[]) => T[];
@@ -39,12 +44,12 @@ export async function paginate<T>(
   query: SelectQueryBuilder<T>,
   input?: IPaginateInput,
   transformer: TTransformer<T> = (x) => x,
-): Promise<IPaginate<T>> {
+): Promise<Paginate<T>> {
   const options: IPaginateResponse = {
     ...paginationDefault,
     itemCount: await query.getCount(),
-    page: input.page || paginateInputDefault.page,
-    limit: input.limit || paginateInputDefault.limit,
+    page: input?.page || paginateInputDefault.page,
+    limit: input?.limit || paginateInputDefault.limit,
   };
 
   options.pageCount = Math.ceil(options.itemCount / options.limit);

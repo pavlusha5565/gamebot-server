@@ -14,6 +14,19 @@ import { StoryEntity } from '../Story/Story.entity';
 import { UserEntity } from '../User/User.entity';
 
 export class Game {
+  @Column({ type: 'jsonb' })
+  attributes: Shape;
+
+  @Column({ type: 'jsonb' })
+  saves: Game[];
+}
+
+@Entity({ name: 'game' })
+@Expose()
+export class GameEntity extends Game {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
   @Column({ name: 'user_id' })
   userId: string;
 
@@ -23,28 +36,21 @@ export class Game {
   @Column({ name: 'event_id' })
   eventId: string;
 
-  @Column({ type: 'jsonb' })
-  attributes: Shape;
-}
-
-@Entity({ name: 'game' })
-@Expose()
-export class GameEntity extends Game {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
-  @Column({ type: 'jsonb' })
-  saves: Game[];
-
   @ManyToOne(() => UserEntity, { cascade: ['remove', 'update'] })
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
-  @ManyToOne(() => StoryEntity, { cascade: ['remove', 'update'] })
+  @ManyToOne(() => StoryEntity, {
+    nullable: true,
+    cascade: ['remove', 'update'],
+  })
   @JoinColumn({ name: 'story_id' })
   story: StoryEntity;
 
-  @ManyToOne(() => StoryEventEntity, { cascade: ['remove', 'update'] })
+  @ManyToOne(() => StoryEventEntity, {
+    nullable: true,
+    cascade: ['remove', 'update'],
+  })
   @JoinColumn({ name: 'event_id' })
   event: StoryEventEntity;
 

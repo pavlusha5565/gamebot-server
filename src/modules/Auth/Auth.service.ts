@@ -12,7 +12,6 @@ import { UserService } from '../User/User.service';
 import { JwtService } from '@nestjs/jwt';
 import { PostgresErrorCode } from 'src/common/constants/postgres.enum';
 import { RegisterDto } from '../User/User.interfaces';
-import { ConfigService } from '@nestjs/config';
 import { ITokenPayload } from './Auth.interface';
 import { AppConfigService } from 'src/config/app/appConfig.service';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -23,7 +22,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { applyObject } from 'src/utils/object';
 import { checkExist } from 'src/utils/exeptions';
-import { expiresInToSeconds, getExpiresDate } from 'src/utils/date';
+import { getExpiresDate } from 'src/utils/date';
 
 export interface ITokenData {
   token: string;

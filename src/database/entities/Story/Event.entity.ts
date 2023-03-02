@@ -1,7 +1,9 @@
+import { Expose } from 'class-transformer';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { IStoryData } from './Event.interface';
 import { StoryEntity } from './Story.entity';
 
+@Expose()
 export class StoryEvent {
   @Column()
   name: string;
@@ -17,6 +19,7 @@ export class StoryEvent {
 }
 
 @Entity({ name: 'story_event' })
+@Expose()
 export class StoryEventEntity extends StoryEvent {
   @PrimaryGeneratedColumn('uuid')
   id: string;

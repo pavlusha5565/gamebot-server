@@ -11,7 +11,7 @@ import { Request, Response } from 'express';
 import { SessionEntity } from 'src/database/entities/User/Session.entity';
 import { UserEntity } from 'src/database/entities/User/User.entity';
 import { parseJwt } from 'src/utils/object';
-import { User } from '../User/User.decorator';
+import { PUser } from '../User/User.decorator';
 import { RegisterDto } from '../User/User.interfaces';
 import { UserService } from '../User/User.service';
 import { ITokenPayload } from './Auth.interface';
@@ -40,7 +40,7 @@ export class AuthController {
   @Post('login')
   @UseGuards(LocalAuthGuard)
   public async login(
-    @User() user: UserEntity,
+    @PUser() user: UserEntity,
     @Res() response: Response,
   ): Promise<Response<SessionEntity>> {
     const session = await this.authService.createSession(user);
@@ -57,8 +57,8 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @UseGuards(JwtAuthGuard)
-  public async refresh(@User() user: UserEntity, @Res() response: Response) {
+  @UseGuards(JwtRefreshGuard)
+  public async refresh(@PUser() user: UserEntity, @Res() response: Response) {
     const token = this.authService.getAuthToken(user.id, user.email);
     response.setHeader(
       'Set-Cookie',
@@ -69,7 +69,7 @@ export class AuthController {
 
   @Post('logout')
   public async logout(
-    @User() user: UserEntity,
+    @PUser() user: UserEntity,
     @Req() request: Request,
     @Res() response: Response,
   ) {

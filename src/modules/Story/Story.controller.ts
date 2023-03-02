@@ -7,18 +7,19 @@ import {
   SerializeOptions,
   UseGuards,
 } from '@nestjs/common';
-import { StoryEvent } from 'src/database/entities/Story/Event.entity';
+import { StoryEventEntity } from 'src/database/entities/Story/Event.entity';
 import { Story, StoryEntity } from 'src/database/entities/Story/Story.entity';
 import { UserEntity } from 'src/database/entities/User/User.entity';
 import { checkExist } from 'src/utils/exeptions';
+import { PaginateInput } from 'src/utils/query/pagination';
 import { JwtAuthGuard } from '../Auth/guard/jwt-auth.guard';
-import { User } from '../User/User.decorator';
+import { PUser } from '../User/User.decorator';
 import { StoryService } from './Story.service';
 import { StoryEventService } from './StoryEvent.service';
 
 @Controller('story')
 @SerializeOptions({
-  strategy: 'excludeAll',
+  strategy: 'exposeAll',
 })
 export class StoryController {
   constructor(
@@ -34,19 +35,28 @@ export class StoryController {
   @Post('new')
   @UseGuards(JwtAuthGuard)
   public async createStory(
-    @User() user: UserEntity,
+    @PUser() user: UserEntity,
     @Body() data: Partial<Story>,
   ) {
     return this.storyService.createStory(user, data);
   }
 
-  @Post(':story/event/new')
-  @UseGuards()
-  public async createEvent(
-    @Param('story') id: string,
-    @Body() data: StoryEvent,
+  @Get(':storyId/events')
+  public async getEvents(
+    @Param('storyId') storyId: string,
+    @Body() input: PaginateInput<any>,
   ) {
-    const story = await this.storyService.findById(id);
+    return this.eventService.search({ storyId: storyId }, input?.page);
+  }
+
+  @Post(':storyId/event/new')
+  @UseGuards(JwtAuthGuard)
+  public async createEvent(
+    @Param('storyId') id: string,
+    @Body() data: StoryEventEntity,
+    @PUser() user: UserEntity,
+  ) {
+    const story = await this.storyService.findById(id, user.id);
     checkExist(story);
     return this.eventService.createEvent(data, story);
   }
